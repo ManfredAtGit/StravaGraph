@@ -120,11 +120,31 @@ function setupUIEventListeners() {
     setupPanelToggle();
     setupLevelThreshold();
     setupSearchFunctionality();
+    setupInfoButton();
 }
 
 /******************************
  * UI CONTROL FUNCTIONS
  ******************************/
+function setupInfoButton() {
+    const infoButton = document.getElementById('info-button');
+    const infoModal = document.getElementById('info-modal');
+    const closeButton = document.getElementById('close-info');
+
+    if (infoButton && infoModal && closeButton) {
+        infoButton.addEventListener('click', () => {
+            infoModal.show();
+        });
+
+        closeButton.addEventListener('click', () => {
+            infoModal.hide();
+        });
+    };
+
+}
+
+
+
 function setupPanelToggle() {
     const toggleButton = document.getElementById('toggle-panel');
     const controlPanel = document.getElementById('control-panel');
