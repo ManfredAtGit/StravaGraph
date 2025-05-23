@@ -10,10 +10,40 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <div class="graph-title">Strava Following Network Graph</div>
+
+    <div class="graph-title">
+        <span>Strava Following Network Graph</span>
+        <sl-icon-button name="info-circle" id="info-button" label="Information" class="info-button"></sl-icon-button>
+    </div>
     <div id="visualization">
         <!-- D3 visualization will be rendered here -->
     </div>
+
+    <!-- Info Modal -->
+    <sl-dialog id="info-modal" label="About Strava Network Graph" class="info-modal">
+        <h3>About This Application</h3>
+        <p>Interactive graph of the Strava cycling network of a specific athlete. Starting point for the graph is a specific Strava athlete (level 0). The graph shows connections between athletes based on who follows whom.</p>
+        
+        <h4>How to Interact</h4>
+        <ul>
+            <li><strong>Double-click</strong> on a node to highlight it and its neighbors</li>
+            <li><strong>Double-click</strong> on a link to highlight it and its connected nodes</li>
+            <li><strong>Search</strong> for specific athletes using the search bar</li>
+            <li><strong>Click</strong> on a search result to highlight the node and center the graph</li>
+            <li><strong>Click</strong> anywhere on the graph to reset highlights</li>
+            <li>Use the <strong>level threshold</strong> slider to filter nodes by connection level</li>
+            <li>Toggle between <strong>light and dark mode</strong> using the theme button (moon/sun) in the Graph Control header</li>
+            <li>Use the <strong>fit to screen</strong> button to reset the view</li>
+            <li><strong>Click</strong> on the <strong>chevron</strong> icon to collapse or expand the control panel</li>
+            
+        </ul>
+        
+
+        <p>This application uses D3.js for visualization and is built with modern web technologies.</p>
+        
+        <sl-button slot="footer" variant="primary" id="close-info">Close</sl-button>
+    </sl-dialog>
+
 
     <!-- Floating Control Panel -->
     <div id="control-panel" class="floating-panel">
