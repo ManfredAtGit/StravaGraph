@@ -1,0 +1,208 @@
+/* Base styles */
+:root {
+    --panel-bg: rgba(255, 255, 255, 0.95);
+    --panel-border: 1px solid rgba(0, 0, 0, 0.1);
+    --panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --panel-radius: 8px;
+    --transition-speed: 0.2s;
+
+    --graph-text: #333333;  /* Default text color for light theme */
+    --graph-text-dim: #666666;  /* Dimmed text for less important elements */
+}
+
+
+/****************/
+/* Add this after your existing :root variables */
+:root[data-theme="dark"] {
+    --panel-bg: rgba(30, 30, 35, 0.95);
+    --panel-border: 1px solid rgba(255, 255, 255, 0.1);
+    --panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --text-color: #ffffff;
+    --text-muted: #a0a0a0;
+    --bg-color: #121212;
+
+    --graph-text: #ffffff;  /* Default text color for dark theme */
+    --graph-text-dim: #a0a0a0;  /* Dimmed text for less important elements */
+}
+
+/* Add these base styles */
+body {
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, #000000);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Update panel header for dark theme */
+:root[data-theme="dark"] .panel-header {
+    background: #2d2d2d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/************/
+
+/* Visualization container */
+#visualization {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Floating control panel */
+.floating-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background: var(--panel-bg);
+    border-radius: var(--panel-radius);
+    box-shadow: var(--panel-shadow);
+    border: var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-speed) ease;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* Panel header */
+.panel-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    flex-grow: 1;
+    padding: 0 0.5rem;
+}
+
+/* Panel content */
+.panel-content {
+    padding: 1rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* Control groups */
+.control-group {
+    margin-bottom: 1rem;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.control-fullwidth {
+    width: 100%;
+}
+
+/* Search results */
+.search-results {
+    margin-top: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    display: none;
+}
+
+.search-results.visible {
+    display: block;
+}
+
+.search-results ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.search-results li {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.search-results li:hover {
+    background-color: #f7fafc;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Node and link styles (keep your existing D3 styles) */
+.node {
+    fill: steelblue;
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.link {
+    stroke: #999;
+    stroke-opacity: 0.6;
+    stroke-width: 1px;
+}
+
+.label {
+    font-size: 10px;
+    pointer-events: none;
+}
+
+.arrowhead {
+    fill: #999;
+}
+
+/* Add this to your existing CSS */
+.floating-panel.collapsed .panel-content {
+    display: none;
+}
+
+.floating-panel.collapsed .panel-header {
+    border-bottom: none;
+}
+
+/* Graph title styles */
+.graph-title {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--graph-text, #333);
+    background-color: var(--panel-bg, rgba(255, 255, 255, 0.9));
+    padding: 8px 16px;
+    border-radius: var(--panel-radius);
+    box-shadow: var(--panel-shadow);
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: var(--panel-border);
+    transition: all 0.3s ease;
+}
+
+/* Dark theme adjustments */
+:root[data-theme="dark"] .graph-title {
+    color: var(--graph-text, #fff);
+    background-color: rgba(30, 30, 35, 0.9);
+}
+
+/* Add a subtle animation on hover */
+.graph-title:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}

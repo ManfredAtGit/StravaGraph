@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava Network Graph</title>
+    <!-- Shoelace CSS (light theme) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="graph-title">Strava Following Network Graph</div>
+    <div id="visualization">
+        <!-- D3 visualization will be rendered here -->
+    </div>
+
+    <!-- Floating Control Panel -->
+    <div id="control-panel" class="floating-panel">
+        <div class="panel-header">
+            <sl-icon-button name="gear" label="Settings"></sl-icon-button>
+            <h3>Graph Controls</h3>
+            <div class="header-actions">
+                <sl-icon-button name="moon" id="theme-toggle" label="Toggle theme"></sl-icon-button>
+                <sl-icon-button name="chevron-down" id="toggle-panel" label="Toggle panel"></sl-icon-button>
+            </div>
+        </div>
+        
+        <div class="panel-content">
+            <sl-tab-group>
+                <sl-tab slot="nav" panel="filters" title="Filter nodes by level">Filters</sl-tab>
+                <sl-tab slot="nav" panel="search" title="Search for specific athletes">Search</sl-tab>
+                
+                <sl-tab-panel name="filters" title="Adjust level threshold to filter nodes">
+                    <div class="control-group">
+                        <label for="level-threshold">Level Threshold</label>
+                        <sl-select id="level-threshold" value="2" class="control-fullwidth">
+                            <sl-menu-item value="0">Level < 0</sl-menu-item>
+                            <sl-menu-item value="1">Level < 1</sl-menu-item>
+                            <sl-menu-item value="2">Level < 2</sl-menu-item>
+                            <sl-menu-item value="3">Level < 3</sl-menu-item>
+                            <sl-menu-item value="4">All Levels</sl-menu-item>
+                        </sl-select>
+                    </div>
+                </sl-tab-panel>
+                
+                <sl-tab-panel name="search" title="Type to search for athletes (minimum 4 characters)">
+                    <div class="control-group">
+                        <sl-input id="node-search" placeholder="Search athletes by name (min 4 chars)" clearable>
+                            <sl-icon name="search" slot="prefix"></sl-icon>
+                        </sl-input>
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                </sl-tab-panel>
+            </sl-tab-group>
+            
+            <div class="action-buttons">
+                <sl-button id="fit2screen" title="Click to fit graph to screen" variant="primary" class="fit-button" circle>
+                    <sl-icon name="fullscreen" label="Fit to screen"></sl-icon>
+                </sl-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shoelace JS (must be loaded before your script) -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/shoelace.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
