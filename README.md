@@ -30,4 +30,4 @@ The graph is visualized using D3.js and is interactive. You can zoom in and out,
 
 
 ## app is live at github.io
-https://manfred.github.io/StravaGraphWS/
+https://manfred.github.io/StravaGraph/

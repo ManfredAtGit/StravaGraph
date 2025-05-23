@@ -558,8 +558,10 @@ function dragended(event, d) {
  * DATA LOADING
  ******************************/
 function loadData() {
-    const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/all_nodes_df.csv";
-    const edgesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/follow_pairs_df.csv";
+    //const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/all_nodes_df.csv";
+    const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/StravaGraph/refs/heads/main/data/all_nodes_df.csv";
+    //const edgesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/follow_pairs_df.csv";
+    const edgesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/StravaGraph/refs/heads/main/data/follow_pairs_df.csv";
     return Promise.all([
         d3.tsv(nodesDataUrl),
         d3.tsv(edgesDataUrl)
