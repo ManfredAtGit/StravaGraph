@@ -119,6 +119,7 @@ function initTheme() {
 function setupUIEventListeners() {
     setupPanelToggle();
     setupLevelThreshold();
+    setupActivityThreshold();
     setupSearchFunctionality();
     setupInfoButton();
 }
@@ -161,8 +162,20 @@ function setupLevelThreshold() {
     const levelThreshold = document.getElementById('level-threshold');
     levelThreshold.addEventListener('sl-change', (event) => {
         const threshold = parseInt(event.target.value);
-        updateGraph(allNodes, allLinks, threshold, graphGroup);
+        //updateGraph(allNodes, allLinks, threshold, graphGroup);
+        updateGraph();
     });
+}
+
+function setupActivityThreshold() {
+    const activityThreshold = document.getElementById('activity-threshold');
+    if (activityThreshold) {
+        activityThreshold.addEventListener('sl-change', (event) => {
+            const threshold = parseInt(event.target.value);
+            //updateGraphWithActivityThreshold(threshold);
+            updateGraph();
+        });
+    }
 }
 
 function setupSearchFunctionality() {
@@ -337,6 +350,48 @@ function tick() {
     }
 }
 
+/******************************
+ * TOOLTIP FUNCTIONS
+ ******************************/
+function showTooltip(event, d) {
+    event.stopPropagation();
+    
+    const tooltip = d3.select("#tooltip");
+    const tooltipContent = d3.select(".tooltip-content");
+    
+
+    // Set tooltip content
+    tooltipContent.html(`
+        <div><strong>${d.name}</strong></div>
+        <div>Activities: ${parseInt(d.activity_count) || 0}</div>
+        <div>Total distance: ${parseInt(d.total_distance/1000)} Tkm</div>
+        <div>Total Time: ${parseInt(d["total_time(hr)"]) || 0} hrs</div>
+        <div>Longest Ride: ${parseInt(d.longest_ride)} km</div>
+        <div>Max Climb: ${parseInt(d.max_climb)} m</div>
+    `);
+    
+    // Position tooltip near the cursor
+    tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px")
+        .classed("visible", true);
+}
+
+// Hide tooltip when clicking elsewhere
+d3.select("body").on("click", function() {
+    d3.select("#tooltip").classed("visible", false);
+});
+
+// Update tooltip position on mouse move
+d3.select("body").on("mousemove", function(event) {
+    const tooltip = d3.select("#tooltip.visible");
+    if (!tooltip.empty()) {
+        tooltip
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 10) + "px");
+    }
+});
+
 
 /******************************
  * GRAPH INITIALIZATION
@@ -378,13 +433,17 @@ function initGraph(nodes, links, initialThreshold) {
         .on("tick", tick);
 
     // Initial graph display
-    updateGraph(nodes, links, initialThreshold, graphGroup);
+    //updateGraph(nodes, links, initialThreshold, graphGroup);
+    updateGraph();
 
+    /*
     // Add event listener to threshold input
     d3.select("#level-threshold").on("change", function() {
         selectedThreshold = +this.value;
-        updateGraph(allNodes, allLinks, selectedThreshold, graphGroup);
+        //updateGraph(allNodes, allLinks, selectedThreshold, graphGroup);
+        updateGraph();
     });
+    */    
     
     /*
     //fitToScreen(); // Call fitToScreen after initial render
@@ -394,22 +453,149 @@ function initGraph(nodes, links, initialThreshold) {
 /******************************
  * GRAPH UPDATE
  ******************************/
-/*
-// function to update graph based on selected threshold
-// only nodes and connecting lonks with level below the threshold are shown
-*/
-function updateGraph(nodesToShow, linksToShow, threshold, currentGraphGroup) {
-    console.log("updateGraph called with threshold:", threshold);
 
-    // filter nodes and links based on the threshold
-    // nodes with NaN level values are set to level=2
-    const filteredNodes = nodesToShow.filter(node => {
+function updateGraph() {
+    // Get current threshold values from UI
+    const levelThreshold = parseInt(document.getElementById('level-threshold').value);
+    const activityThreshold = parseInt(document.getElementById('activity-threshold').value);
+    
+    console.log(`Updating graph with levelThreshold: ${levelThreshold}, activityThreshold: ${activityThreshold}`);
+
+    // Apply both filters to allNodes
+    let filteredNodes = allNodes.filter(node => {
+        // Apply activity threshold filter
+        if (activityThreshold > 0 && node.activity_count < activityThreshold) {
+            return false;
+        }
+        
+        // Apply level threshold filter
         let levelValue = node.level;
         if (isNaN(parseFloat(levelValue))) {
             levelValue = 2;
         }
         const isLevelValid = levelValue !== "";
-        const isBelowThreshold = isLevelValid && parseFloat(levelValue) < threshold;
+        const isBelowThreshold = isLevelValid && parseFloat(levelValue) < levelThreshold;
+        if (!isLevelValid || !isBelowThreshold) {
+            return false;
+        }
+        
+        return true;
+    });
+
+    console.log("Filtered nodes count:", filteredNodes.length);
+
+    // Update links based on filtered nodes
+    const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = allLinks.filter(link =>
+        filteredNodeIds.has(link.source?.id) && filteredNodeIds.has(link.target?.id)
+    );
+
+    // Update the graph visualization
+    updateGraphVisualization(filteredNodes, filteredLinks, graphGroup);
+}
+
+
+function updateGraphVisualization(nodes, links, currentGraphGroup) {
+    // Update nodes
+    const updatedNodes = currentGraphGroup.select(".nodes").selectAll("circle")
+        .data(nodes, d => d.id);
+    
+    updatedNodes.exit().remove();
+    
+    const enteredNodes = updatedNodes.enter().append("circle")
+        .attr("class", "node")
+        .attr("r", 10)
+        .attr("node-id", d => d.id)
+        .each(function (d) {
+            // Only set lightblue for nodes with activity_count > 0, others keep default color
+            if (d.activity_count <= 0) {
+                d3.select(this).style("fill", "lightblue");
+            }
+            // Store the computed color in originalNodeColors
+            originalNodeColors.set(d.id, d3.select(this).style("fill"));
+        })
+
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
+        .on("click", showTooltip)  // Add click handler for tooltip
+        .on("dblclick", highlightConnectedNodes);
+    
+    node = enteredNodes.merge(updatedNodes);
+    //console.log("Default node color:", d3.select("circle.node").style("fill")); //rgb(70, 130, 180)
+
+    console.log("updateGraphVisualization, nodes: ", nodes);
+
+    
+    // Update labels
+    const updatedLabels = currentGraphGroup.select(".labels").selectAll("text")
+        .data(nodes, d => d.id);
+    
+    updatedLabels.exit().remove();
+    
+    const enteredLabels = updatedLabels.enter().append("text")
+        .attr("class", "label")
+        .text(d => d.name)
+        .style("fill", "var(--graph-text)")
+        .attr("dx", 12)
+        .attr("dy", ".35em");
+    
+    label = enteredLabels.merge(updatedLabels);
+
+    // Update links
+    const updatedLinks = currentGraphGroup.select(".links").selectAll("line")
+        .data(links, d => `${d.source?.id}-${d.target?.id}`);
+    
+    updatedLinks.exit().remove();
+    
+    const enteredLinks = updatedLinks.enter().append("line")
+        .attr("class", "link")
+        .attr("marker-end", "url(#end)")
+        .style("stroke", "#999")
+        .style("stroke-opacity", 0.6)
+        .style("stroke-width", "1px")
+        .each(function (d) {
+            originalLinkColors.set(d, d3.select(this).style("stroke"));
+        })
+        .on("dblclick", highlightLink);
+    
+    link = enteredLinks.merge(updatedLinks);
+
+    // Restart simulation with new data
+    simulation.nodes(nodes)
+        .force("link").links(links);
+    simulation.alpha(1).restart();
+}
+
+
+
+/*
+// function to update graph based on selected threshold
+// only nodes and connecting lonks with level below the threshold are shown
+*/
+/*
+function updateGraph(nodesToShow, linksToShow, levelThreshold, currentGraphGroup) {
+    console.log("updateGraph called with threshold:", levelThreshold);
+
+    // First apply activity threshold filter if nodesToShow is different from allNodes
+    let filteredNodes = nodesToShow;
+    if (nodesToShow === allNodes) {
+        const activityThreshold = parseInt(document.getElementById('activity-threshold').value);
+        if (activityThreshold > 0) {
+            filteredNodes = nodesToShow.filter(node => node.activity_count >= activityThreshold);
+        }
+    }
+
+    // filter nodes and links based on the threshold
+    // nodes with NaN level values are set to level=2
+    filteredNodes = filteredNodes.filter(node => {
+        let levelValue = node.level;
+        if (isNaN(parseFloat(levelValue))) {
+            levelValue = 2;
+        }
+        const isLevelValid = levelValue !== "";
+        const isBelowThreshold = isLevelValid && parseFloat(levelValue) < levelThreshold;
         return isLevelValid && isBelowThreshold;
     });
     console.log("updateGraph ,  filteredNodes: ", filteredNodes);
@@ -467,6 +653,7 @@ function updateGraph(nodesToShow, linksToShow, threshold, currentGraphGroup) {
         .force("link").links(filteredLinks);
     simulation.alpha(1).restart();
 }
+*/
 
 /******************************
  * NODE & LINK INTERACTIONS
@@ -578,8 +765,8 @@ function dragended(event, d) {
  * DATA LOADING
  ******************************/
 function loadData() {
-    //const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/all_nodes_df.csv";
-    const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/StravaGraph/refs/heads/main/data/all_nodes_df.csv";
+    const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/all_nodes_df.csv";
+    //const nodesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/StravaGraph/refs/heads/main/data/all_nodes_df.csv";
     //const edgesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/gpxstore/refs/heads/main/follow_pairs_df.csv";
     const edgesDataUrl = "https://raw.githubusercontent.com/ManfredAtGit/StravaGraph/refs/heads/main/data/follow_pairs_df.csv";
     return Promise.all([

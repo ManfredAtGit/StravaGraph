@@ -28,10 +28,12 @@
         <ul>
             <li><strong>Double-click</strong> on a node to highlight it and its neighbors</li>
             <li><strong>Double-click</strong> on a link to highlight it and its connected nodes</li>
+            <li><strong>Single-click</strong> on a node to display athlete-statistics</li>
             <li><strong>Search</strong> for specific athletes using the search bar</li>
             <li><strong>Click</strong> on a search result to highlight the node and center the graph</li>
             <li><strong>Click</strong> anywhere on the graph to reset highlights</li>
-            <li>Use the <strong>level threshold</strong> slider to filter nodes by connection level</li>
+            <li>Use the <strong>level threshold</strong> to filter nodes by connection level</li>
+            <li>Use the <strong>activity threshold</strong> to filter nodes by activity count</li>
             <li>Toggle between <strong>light and dark mode</strong> using the theme button (moon/sun) in the Graph Control header</li>
             <li>Use the <strong>fit to screen</strong> button to reset the view</li>
             <li><strong>Click</strong> on the <strong>chevron</strong> icon to collapse or expand the control panel</li>
@@ -72,6 +74,15 @@
                             <sl-menu-item value="4">All Levels</sl-menu-item>
                         </sl-select>
                     </div>
+                    <div class="control-group">
+                        <label for="activity-threshold">Activity Threshold</label>
+                        <sl-radio-group id="activity-threshold" value="0" class="control-fullwidth">
+                            <sl-radio value="0" checked>No Filter</sl-radio>
+                            <sl-radio value="100">100+ activities</sl-radio>
+                            <sl-radio value="1000">1000+ activities</sl-radio>
+                            <sl-radio value="5000">5000+ activities</sl-radio>
+                        </sl-radio-group>
+                    </div>
                 </sl-tab-panel>
                 
                 <sl-tab-panel name="search" title="Type to search for athletes (minimum 4 characters)">
@@ -91,6 +102,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip">
+        <div class="tooltip-content"></div>
+    </div> 
 
     <!-- Shoelace JS (must be loaded before your script) -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/shoelace.js"></script>

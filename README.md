@@ -10,13 +10,19 @@ The graph is visualized using D3.js and is interactive. You can zoom in and out,
 
 - dblclick on a node to highlight it and its neighbors.
 - dblclick on a link to highlight it and its source and target nodes.
+- single click on node to display athlete-statistics
 - search for specific athletes using the search bar.
 - click on a search result to highlight the node and center the graph on it.
 - click on the graph to reset the highlight.
 - click on the toggle panel button to collapse or expand the panel.
 - click on the level threshold slider to filter nodes by level.
-- click on the theme toggle button to switch between light and dark mode.
+- click on the activity threshold slider to filter nodes by activity count.
+    note: Strava athlete accounts marked as private have activity count = 0.
+- click on the theme toggle button to switch between light and dark mode. 
 - click on the fit to screen button to fit the graph to the screen.
+
+- conditional coloring of nodes based on activity count (light blue for activity_count=0)
+
 
 ## software stack
 
@@ -31,3 +37,6 @@ The graph is visualized using D3.js and is interactive. You can zoom in and out,
 
 ## app is live at github.io
 https://manfredatgit.github.io/StravaGraph/
+
+for more strava and cycling apps see https://github.com/manfredatgit/LeafletGpx/
+
